@@ -1,4 +1,6 @@
 export default class RedisCache {
-    get(key: any): Promise<any>;
-    set(key: any, value: any, maxAge: any): Promise<unknown>;
+    private local;
+    constructor();
+    get(key: string): Promise<any>;
+    set(key: string, value: any, maxAge: number): Promise<unknown>;
 }
