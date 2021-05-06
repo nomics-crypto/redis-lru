@@ -10,17 +10,18 @@ if (LRU_CACHE_SIZE) {
 }
 
 export default class LRUCache {
-  private cache;
+  private cache: LRU;
+
   constructor() {
     this.cache = new LRU({ max });
   }
 
-  public async get(key): Promise<any> {
+  public async get(key: string): Promise<any> {
     const value = this.cache.get(key);
     return value ? JSON.parse(value) : undefined;
   }
 
-  public async set(key, value, maxAge) {
+  public async set(key: string, value: any, maxAge: number) {
     return this.cache.set(key, JSON.stringify(value), maxAge * 1000);
   }
 }
