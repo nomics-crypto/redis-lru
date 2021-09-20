@@ -1,1 +1,1 @@
-export default function <T>(key: any, maxAge: any, value: () => T): Promise<any>;
+export default function <T>(key: string, maxAge: number, value: () => Promise<T>): Promise<any>;

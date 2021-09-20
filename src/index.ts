@@ -3,17 +3,22 @@ import RedisCache from "./redis-cache";
 
 const cache = process.env.REDIS_URL ? new RedisCache() : new LRUCache();
 
-export default async function<T>(key, maxAge, value: () => T): Promise<any> {
+export default async function<T>(key: string, maxAge: number, value: () => Promise<T>): Promise<any> {
   try {
     const hit = await cache.get(key);
     if (hit) {
       return hit;
     }
-
-    const result = await value();
-    cache.set(key, result, maxAge);
-    return result;
   } catch (err) {
     return value();
+  }
+
+  const result = await value();
+  try {
+    await cache.set(key, result, maxAge);
+    return result;
+  } catch (err) {
+    console.error(err);
+    return result;
   }
 }

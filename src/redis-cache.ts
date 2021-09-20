@@ -55,20 +55,29 @@ export default class RedisCache {
   public set(key: string, value: any, maxAge: number) {
     const localDeadline = currentSeconds() + maxAge;
     return new Promise((resolve, reject) => {
-      client.setex(key, maxAge, JSON.stringify(value), (err: any) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve();
+      try {
+        client.setex(key, maxAge, JSON.stringify(value), (err: any) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve();
 
-        // Account for the time it takes to write the data to redis
-        // and write to the local cache.
-        const localAge = localDeadline - currentSeconds();
-        if (localAge > 0) {
-          this.local.set(key, value, localDeadline - currentSeconds());
-        }
-      });
+          // Account for the time it takes to write the data to redis
+          // and write to the local cache.
+          const localAge = localDeadline - currentSeconds();
+          if (localAge > 0) {
+            this.local.set(key, value, localAge);
+          }
+        });
+      } catch (err) {
+        reject(err);
+        return;
+      }
     });
+  }
+
+  public stop() {
+    this.local.stop();
   }
 }
